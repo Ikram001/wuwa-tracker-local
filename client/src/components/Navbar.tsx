@@ -31,11 +31,11 @@ export default function Navbar({
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-wuwa-surface border-b border-wuwa-border">
+      <header className="sticky top-0 z-50 bg-black/85 backdrop-blur border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <div className="flex items-center gap-2 shrink-0">
-            <div className="p-1.5 rounded-lg bg-wuwa-accent/20">
+            <div className="hover-card p-1.5 rounded-lg bg-black/50 border border-white/10">
               <img
                 src="/logo.jpg"
                 alt="WuWa Tracker logo"
@@ -43,9 +43,9 @@ export default function Navbar({
               />
             </div>
             <span className="font-semibold text-lg tracking-tight">
-              WuWa <span className="text-wuwa-accent">Tracker</span>
+              WuWa <span className="text-white/90">Pull Tracker</span>
             </span>
-            <span className="hidden sm:block text-xs text-wuwa-muted border border-wuwa-border rounded px-1.5 py-0.5">
+            <span className="hidden sm:block text-xs text-wuwa-muted border border-white/10 rounded px-1.5 py-0.5">
               LOCAL
             </span>
           </div>
@@ -58,8 +58,8 @@ export default function Navbar({
                 onClick={() => setTab(t)}
                 className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
                   tab === t
-                    ? "bg-wuwa-accent text-white shadow-lg shadow-wuwa-accent/25"
-                    : "text-wuwa-muted hover:text-wuwa-text hover:bg-wuwa-card"
+                    ? "bg-white/15 text-white border border-white/15"
+                    : "text-wuwa-muted hover:text-wuwa-text hover:bg-white/5"
                 }`}>
                 {t}
               </button>
@@ -75,7 +75,7 @@ export default function Navbar({
             <button
               onClick={() => setHelpOpen(true)}
               title="Open help guide"
-              className="p-1.5 rounded-lg text-wuwa-muted hover:text-wuwa-text hover:bg-wuwa-card transition-all">
+              className="p-1.5 rounded-lg text-wuwa-muted hover:text-wuwa-text hover:bg-white/5 transition-all">
               <HelpCircle className="w-5 h-5" />
             </button>
           </div>

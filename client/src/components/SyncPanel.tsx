@@ -105,7 +105,7 @@ export default function SyncPanel({ onSynced }: SyncPanelProps) {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* ── Quick-start instructions ── */}
-      <div className="bg-wuwa-card border border-wuwa-border rounded-xl p-5 space-y-3">
+      <div className="hover-card bg-black/65 border border-white/10 rounded-xl p-5 space-y-3">
         <div className="flex items-center gap-2 text-wuwa-accent font-semibold">
           <AlertCircle className="w-5 h-5" />
           Before syncing
@@ -127,9 +127,9 @@ export default function SyncPanel({ onSynced }: SyncPanelProps) {
             Click <span className="text-wuwa-text">Sync Pulls</span>
           </li>
         </ol>
-        <p className="text-xs text-wuwa-muted border-t border-wuwa-border pt-3">
+        <p className="text-xs text-wuwa-muted border-t border-white/10 pt-3">
           Data is fetched directly from Kuro's API and stored locally in{" "}
-          <code className="text-wuwa-accent bg-wuwa-surface px-1 rounded">
+          <code className="text-white bg-black/55 px-1 rounded border border-white/10">
             server/data/wuwa_pulls.json
           </code>
           . Nothing is sent to any third-party server.
@@ -137,7 +137,7 @@ export default function SyncPanel({ onSynced }: SyncPanelProps) {
       </div>
 
       {/* ── URL input + sync button ── */}
-      <div className="bg-wuwa-card border border-wuwa-border rounded-xl p-5 space-y-4">
+      <div className="hover-card bg-black/65 border border-white/10 rounded-xl p-5 space-y-4">
         <h2 className="font-semibold">Convene History URL</h2>
 
         <div className="flex gap-2">
@@ -147,13 +147,13 @@ export default function SyncPanel({ onSynced }: SyncPanelProps) {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://aki-gm-resources…"
-              className="w-full bg-wuwa-surface border border-wuwa-border rounded-lg pl-9 pr-4 py-2.5 text-sm placeholder-wuwa-muted focus:outline-none focus:border-wuwa-accent transition-colors"
+              className="w-full bg-black/55 border border-white/10 rounded-lg pl-9 pr-4 py-2.5 text-sm placeholder-wuwa-muted focus:outline-none focus:border-white/35 transition-colors"
             />
           </div>
           <button
             onClick={handleDetect}
             disabled={detecting || syncing}
-            className="flex items-center gap-2 px-4 py-2.5 bg-wuwa-surface border border-wuwa-border rounded-lg text-sm text-wuwa-muted hover:text-wuwa-text hover:border-wuwa-accent disabled:opacity-40 transition-all whitespace-nowrap">
+            className="flex items-center gap-2 px-4 py-2.5 bg-black/55 border border-white/10 rounded-lg text-sm text-wuwa-muted hover:text-wuwa-text hover:border-white/35 disabled:opacity-40 transition-all whitespace-nowrap">
             <RefreshCw
               className={`w-4 h-4 ${detecting ? "animate-spin" : ""}`}
             />
@@ -164,7 +164,7 @@ export default function SyncPanel({ onSynced }: SyncPanelProps) {
         <button
           onClick={handleSync}
           disabled={syncing || detecting || !url.trim()}
-          className="w-full py-3 rounded-xl bg-wuwa-accent hover:bg-wuwa-accent/80 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold transition-all shadow-lg shadow-wuwa-accent/20 flex items-center justify-center gap-2">
+          className="w-full py-3 rounded-xl bg-white/15 hover:bg-white/20 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold transition-all border border-white/10 flex items-center justify-center gap-2">
           <RefreshCw className={`w-5 h-5 ${syncing ? "animate-spin" : ""}`} />
           {syncing ? "Syncing all banners…" : "Sync Pulls"}
         </button>
@@ -173,7 +173,7 @@ export default function SyncPanel({ onSynced }: SyncPanelProps) {
       {/* ── Result banner ── */}
       {result && (
         <div
-          className={`flex items-start gap-3 p-4 rounded-xl border ${resultBg}`}>
+          className={`hover-card flex items-start gap-3 p-4 rounded-xl border ${resultBg}`}>
           <ResultIcon className={`w-5 h-5 mt-0.5 shrink-0 ${resultColor}`} />
           <div className="space-y-1 min-w-0">
             <p className="text-sm font-medium">{result.message}</p>

@@ -3,10 +3,7 @@
  * @description In-app help modal.
  *
  * Renders a full step-by-step usage guide, pity reference table,
- * troubleshooting tips, and network transparency note — all without
- * leaving the app or opening an external browser tab.
- *
- * Closes on backdrop click or the × button.
+ * troubleshooting tips, and network transparency note.
  */
 
 interface HelpModalProps {
@@ -22,22 +19,20 @@ export default function HelpModal({ open, onClose }: HelpModalProps) {
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
       onClick={onClose}>
       <div
-        className="relative bg-wuwa-card border border-wuwa-border rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl"
+        className="relative bg-black/80 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl"
         onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="sticky top-0 bg-wuwa-card border-b border-wuwa-border px-6 py-4 flex items-center justify-between rounded-t-2xl">
+        <div className="sticky top-0 bg-black/85 border-b border-white/10 px-6 py-4 flex items-center justify-between rounded-t-2xl backdrop-blur">
           <h2 className="text-lg font-semibold text-wuwa-text">
             How to use WuWa Tracker
           </h2>
           <button
             onClick={onClose}
             className="text-wuwa-muted hover:text-wuwa-text text-xl leading-none transition-colors">
-            ✕
+            x
           </button>
         </div>
 
         <div className="px-6 py-5 space-y-7 text-sm text-wuwa-text">
-          {/* Syncing pulls */}
           <section className="space-y-3">
             <h3 className="font-semibold text-wuwa-accent text-base">
               Syncing your pulls
@@ -50,7 +45,7 @@ export default function HelpModal({ open, onClose }: HelpModalProps) {
                 ["1", "Launch Wuthering Waves."],
                 [
                   "2",
-                  "Open Convene → Convene History and wait for the list to fully load. This writes the URL to your local log file.",
+                  "Open Convene -> Convene History and wait for the list to fully load. This writes the URL to your local log file.",
                 ],
                 ["3", "Switch to this app and click the Sync tab."],
                 [
@@ -63,7 +58,7 @@ export default function HelpModal({ open, onClose }: HelpModalProps) {
                 ],
                 [
                   "6",
-                  "Check the Stats tab for updated pity counts and 5★ history.",
+                  "Check the Stats tab for updated pity counts and 5-star history.",
                 ],
               ].map(([n, text]) => (
                 <li key={n} className="flex gap-3">
@@ -76,25 +71,26 @@ export default function HelpModal({ open, onClose }: HelpModalProps) {
             </ol>
           </section>
 
-          {/* Tabs explained */}
           <section className="space-y-3">
             <h3 className="font-semibold text-wuwa-accent text-base">Tabs</h3>
             <div className="space-y-2">
               {[
                 [
                   "Stats",
-                  "Pity bars (5★ and 4★), average pulls per 5★, and a chip list of every 5★ you've pulled on each banner.",
+                  "Pity bars (5-star and 4-star), average pulls per 5-star, and a history list.",
                 ],
                 [
                   "History",
-                  "Paginated full pull log. Filter by star rating, banner, or search by name. Export to CSV with one click.",
+                  "Paginated full pull log. Filter by star rating, banner, or search by name. Export to CSV.",
                 ],
                 [
                   "Sync",
                   "Auto-detect or manually paste your convene URL, then trigger a sync.",
                 ],
               ].map(([tab, desc]) => (
-                <div key={tab} className="bg-wuwa-surface rounded-lg p-3">
+                <div
+                  key={tab}
+                  className="hover-card bg-black/50 border border-white/10 rounded-lg p-3">
                   <span className="font-medium text-wuwa-accent">{tab}</span>
                   <span className="text-wuwa-muted ml-2">{desc}</span>
                 </div>
@@ -102,15 +98,14 @@ export default function HelpModal({ open, onClose }: HelpModalProps) {
             </div>
           </section>
 
-          {/* Pity reference */}
           <section className="space-y-3">
             <h3 className="font-semibold text-wuwa-accent text-base">
               Pity thresholds
             </h3>
-            <div className="overflow-x-auto rounded-lg border border-wuwa-border">
+            <div className="overflow-x-auto rounded-lg border border-white/10">
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="bg-wuwa-surface text-wuwa-muted">
+                  <tr className="bg-black/50 text-wuwa-muted">
                     <th className="text-left px-3 py-2 font-medium">Banner</th>
                     <th className="text-center px-3 py-2 font-medium">
                       Hard pity
@@ -120,15 +115,14 @@ export default function HelpModal({ open, onClose }: HelpModalProps) {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-wuwa-border">
+                <tbody className="divide-y divide-white/10">
                   {[
                     ["Featured Resonator", "80", "65"],
                     ["Featured Weapon", "80", "65"],
                     ["Standard Resonator", "80", "65"],
                     ["Standard Weapon", "80", "65"],
-                    ["Beginner banners", "50", "~35"],
                   ].map(([banner, hard, soft]) => (
-                    <tr key={banner} className="hover:bg-wuwa-border/20">
+                    <tr key={banner} className="hover:bg-white/5">
                       <td className="px-3 py-2">{banner}</td>
                       <td className="px-3 py-2 text-center text-red-400 font-medium">
                         {hard}
@@ -141,13 +135,8 @@ export default function HelpModal({ open, onClose }: HelpModalProps) {
                 </tbody>
               </table>
             </div>
-            <p className="text-wuwa-muted text-xs">
-              ⚡ = soft pity (increased 5★ rate) &nbsp;·&nbsp; 🔥 = hard pity
-              (next pull guaranteed 5★)
-            </p>
           </section>
 
-          {/* Troubleshooting */}
           <section className="space-y-3">
             <h3 className="font-semibold text-wuwa-accent text-base">
               Troubleshooting
@@ -156,24 +145,20 @@ export default function HelpModal({ open, onClose }: HelpModalProps) {
               {[
                 {
                   q: "Auto-detect returns No URL found",
-                  a: "You haven't opened Convene History this session. Open it in-game, wait for it to load, then try again.",
+                  a: "Open Convene History in-game, wait for it to load, then try again.",
                 },
                 {
                   q: "Auto-detect still fails",
-                  a: 'Your game is in a non-standard folder. Open Client\\Saved\\Logs\\Client.log in Notepad, search for "aki-gm-resources", copy the full URL, and paste it manually.',
+                  a: "Open Client\\Saved\\Logs\\Client.log, search for 'aki-gm-resources', and paste that URL manually.",
                 },
                 {
                   q: "Sync fetches 0 new pulls",
-                  a: "Those pulls are already stored locally. The tracker deduplicates by time + name + quality, so nothing is double-counted.",
-                },
-                {
-                  q: "Port already in use",
-                  a: "Edit server/src/config.ts (change PORT) and client/vite.config.ts (change server.port and the proxy target).",
+                  a: "Those pulls are already stored locally. The tracker deduplicates by time + name + quality.",
                 },
               ].map(({ q, a }) => (
                 <div
                   key={q}
-                  className="bg-wuwa-surface rounded-lg p-3 space-y-1">
+                  className="hover-card bg-black/50 border border-white/10 rounded-lg p-3 space-y-1">
                   <p className="font-medium text-wuwa-text">Q: {q}</p>
                   <p className="text-wuwa-muted">A: {a}</p>
                 </div>
@@ -181,20 +166,18 @@ export default function HelpModal({ open, onClose }: HelpModalProps) {
             </div>
           </section>
 
-          {/* Privacy note */}
           <section className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 space-y-1">
-            <p className="font-semibold text-green-400">🔒 Privacy</p>
+            <p className="font-semibold text-green-400">Privacy</p>
             <p className="text-wuwa-muted">
-              The only outbound request is to{" "}
-              <code className="text-wuwa-accent bg-wuwa-surface px-1 rounded">
+              The only outbound request is to
+              <code className="text-wuwa-accent bg-black/50 border border-white/10 px-1 rounded ml-1">
                 gmserver-api.aki-game2.net
-              </code>{" "}
-              — Kuro's own official API, the same one the game uses. No data is
-              sent to any third party. Everything is stored in{" "}
-              <code className="text-wuwa-accent bg-wuwa-surface px-1 rounded">
+              </code>
+              . Everything is stored locally in
+              <code className="text-wuwa-accent bg-black/50 border border-white/10 px-1 rounded ml-1">
                 server/data/wuwa_pulls.json
-              </code>{" "}
-              on your machine.
+              </code>
+              .
             </p>
           </section>
         </div>

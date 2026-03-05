@@ -48,7 +48,7 @@ export default function App() {
   }, [fetchData]);
 
   return (
-    <div className="min-h-screen bg-wuwa-bg text-wuwa-text">
+    <div className="min-h-screen bg-black text-wuwa-text">
       <Navbar tab={tab} setTab={setTab} tabs={TABS} lastUpdated={lastUpdated} />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
@@ -58,7 +58,7 @@ export default function App() {
           </div>
         ) : (
           <>
-            {tab === "Stats" && <StatsPanel stats={stats} />}
+            {tab === "Stats" && <StatsPanel stats={stats} pulls={pulls} />}
             {tab === "History" && <HistoryPanel pulls={pulls} />}
             {tab === "Sync" && <SyncPanel onSynced={fetchData} />}
           </>

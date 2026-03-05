@@ -16,7 +16,7 @@
  * CSV export: GET /api/export/csv browser download.
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Download, Search, X } from "lucide-react";
 import { downloadCsv } from "../api";
 import type { Pull } from "../types";
@@ -64,6 +64,8 @@ interface HistoryPanelProps {
 }
 
 export default function HistoryPanel({ pulls }: HistoryPanelProps) {
+  const tableRef = useRef<HTMLDivElement>(null);
+
   // ── Filter state — all explicitly typed to avoid literal narrowing ────────
   const [search, setSearch] = useState<string>("");
   const [quality, setQuality] = useState<QualityFilter>("all");
@@ -90,9 +92,20 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
     setPage(1);
   };
 
+  const normalizedMainPulls = useMemo<Pull[]>(() => {
+    return pulls
+      .filter((p) => p.cardPoolType in BANNER_SHORT)
+      .map((p) => ({ ...p, qualityLevel: Number(p.qualityLevel) }))
+      .sort((a, b) => {
+        const byTime = b.time.localeCompare(a.time);
+        if (byTime !== 0) return byTime;
+        return b.uid.localeCompare(a.uid);
+      });
+  }, [pulls]);
+
   // ── Filtered + sorted list ────────────────────────────────────────────────
   const filtered = useMemo<Pull[]>(() => {
-    let list = pulls.filter((p) => p.cardPoolType in BANNER_SHORT);
+    let list = [...normalizedMainPulls];
 
     // Banner filter
     if (banner !== "all") {
@@ -107,15 +120,23 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
       list = list.filter((p) => Number(p.qualityLevel) === target);
     }
 
-    // Name search
+    // Search name, type, and banner text for faster discovery.
     const needle = search.trim().toLowerCase();
     if (needle !== "") {
-      list = list.filter((p) => p.name.toLowerCase().includes(needle));
+      list = list.filter((p) => {
+        const bannerText =
+          BANNER_SHORT[String(p.cardPoolType)]?.toLowerCase() ??
+          p.bannerName.toLowerCase();
+        return (
+          p.name.toLowerCase().includes(needle) ||
+          p.resourceType.toLowerCase().includes(needle) ||
+          bannerText.includes(needle)
+        );
+      });
     }
 
-    // Sort newest → oldest
-    return [...list].sort((a, b) => b.time.localeCompare(a.time));
-  }, [pulls, banner, quality, search]);
+    return list;
+  }, [normalizedMainPulls, banner, quality, search]);
 
   // ── Pagination ────────────────────────────────────────────────────────────
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -125,20 +146,23 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
     safePage * PAGE_SIZE,
   );
 
-  const totalMainPulls = pulls.filter(
-    (p) => p.cardPoolType in BANNER_SHORT,
-  ).length;
+  const totalMainPulls = normalizedMainPulls.length;
   const activeFilterCount = [
     search.trim() !== "",
     quality !== "all",
     banner !== "all",
   ].filter(Boolean).length;
 
+  // Scroll table into view whenever filters or page change
+  useEffect(() => {
+    tableRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [search, quality, banner, safePage]);
+
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-4">
       {/* ── Filter bar ── */}
-      <div className="flex flex-wrap gap-3 items-center">
+      <div className="hover-card flex flex-wrap gap-3 items-center bg-black/65 border border-white/10 rounded-xl p-3">
         {/* Name search */}
         <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-wuwa-muted pointer-events-none" />
@@ -147,7 +171,7 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
             value={search}
             onChange={(e) => changeSearch(e.target.value)}
             placeholder="Search by name…"
-            className="w-full bg-wuwa-card border border-wuwa-border rounded-lg pl-9 pr-8 py-2 text-sm placeholder-wuwa-muted focus:outline-none focus:border-wuwa-accent transition-colors"
+            className="w-full bg-black/55 border border-white/10 rounded-lg pl-9 pr-8 py-2 text-sm placeholder-wuwa-muted focus:outline-none focus:border-white/35 transition-colors"
           />
           {search !== "" && (
             <button
@@ -160,15 +184,15 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
         </div>
 
         {/* Quality star buttons */}
-        <div className="flex gap-1">
+        <div className="flex gap-1 p-1 rounded-lg bg-black/45 border border-white/10">
           {(["all", "5", "4", "3"] as const).map((q) => (
             <button
               key={q}
               onClick={() => changeQuality(q)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 quality === q
-                  ? "bg-wuwa-accent text-white shadow shadow-wuwa-accent/30"
-                  : "bg-wuwa-card border border-wuwa-border text-wuwa-muted hover:text-wuwa-text hover:border-wuwa-accent/50"
+                  ? "bg-white/15 text-white shadow"
+                  : "text-wuwa-muted hover:text-wuwa-text"
               }`}>
               {q === "all" ? "All ★" : `${q}★`}
             </button>
@@ -179,7 +203,7 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
         <select
           value={banner}
           onChange={(e) => changeBanner(e.target.value)}
-          className="bg-wuwa-card border border-wuwa-border rounded-lg px-3 py-2 text-sm text-wuwa-text focus:outline-none focus:border-wuwa-accent transition-colors cursor-pointer">
+          className="bg-black/55 border border-white/10 rounded-lg px-3 py-2 text-sm text-wuwa-text focus:outline-none focus:border-white/35 transition-colors cursor-pointer">
           <option value="all">All Banners</option>
           {Object.entries(BANNER_SHORT).map(([id, name]) => (
             <option key={id} value={id}>
@@ -192,7 +216,7 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
         {activeFilterCount > 0 && (
           <button
             onClick={clearAll}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-wuwa-muted border border-wuwa-border bg-wuwa-card hover:text-red-400 hover:border-red-400/50 transition-all">
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-wuwa-muted border border-white/10 bg-black/55 hover:text-red-400 hover:border-red-400/50 transition-all">
             <X className="w-3.5 h-3.5" />
             Clear ({activeFilterCount})
           </button>
@@ -201,7 +225,7 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
         {/* CSV export */}
         <button
           onClick={downloadCsv}
-          className="flex items-center gap-2 px-3 py-1.5 bg-wuwa-card border border-wuwa-border rounded-lg text-sm text-wuwa-muted hover:text-wuwa-text hover:border-wuwa-accent transition-all ml-auto">
+          className="flex items-center gap-2 px-3 py-1.5 bg-black/55 border border-white/10 rounded-lg text-sm text-wuwa-muted hover:text-wuwa-text hover:border-white/35 transition-all ml-auto">
           <Download className="w-4 h-4" />
           Export CSV
         </button>
@@ -215,11 +239,13 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
       </p>
 
       {/* ── Table ── */}
-      <div className="bg-wuwa-card border border-wuwa-border rounded-xl overflow-hidden">
+      <div
+        ref={tableRef}
+        className="hover-card bg-black/65 border border-white/10 rounded-xl overflow-hidden scroll-mt-4">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-wuwa-surface text-wuwa-muted text-xs uppercase tracking-wide">
+              <tr className="bg-black/55 text-wuwa-muted text-xs uppercase tracking-wide">
                 {["#", "Name", "Type", "Banner", "Stars", "Time"].map((h) => (
                   <th key={h} className="text-left px-4 py-3 font-medium">
                     {h}
@@ -233,7 +259,7 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
                   <td colSpan={6} className="text-center py-16 text-wuwa-muted">
                     <div className="flex flex-col items-center gap-2">
                       <Search className="w-8 h-8 opacity-30" />
-                      <span>No pulls match your filters.</span>
+                      <span>No pulls match your filters or search query.</span>
                       {activeFilterCount > 0 && (
                         <button
                           onClick={clearAll}
@@ -252,7 +278,7 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
                   return (
                     <tr
                       key={p.uid}
-                      className={`${QUALITY_ROW_CLASS[ql] ?? ""} hover:bg-wuwa-border/30 transition-colors`}>
+                      className={`${QUALITY_ROW_CLASS[ql] ?? ""} hover:bg-white/5 transition-colors`}>
                       <td className="px-4 py-2.5 text-wuwa-muted text-xs">
                         {(safePage - 1) * PAGE_SIZE + i + 1}
                       </td>
@@ -280,7 +306,7 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
 
         {/* ── Pagination ── */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 bg-wuwa-surface border-t border-wuwa-border text-sm">
+          <div className="flex items-center justify-between px-4 py-3 bg-black/55 border-t border-white/10 text-sm">
             <span className="text-wuwa-muted text-xs">
               Page {safePage} of {totalPages} · {filtered.length} pulls
             </span>
@@ -288,13 +314,13 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
               <button
                 disabled={safePage === 1}
                 onClick={() => setPage(1)}
-                className="px-2 py-1 rounded bg-wuwa-card border border-wuwa-border text-xs disabled:opacity-30 hover:border-wuwa-accent transition-all">
+                className="px-2 py-1 rounded bg-black/55 border border-white/10 text-xs disabled:opacity-30 hover:border-white/35 transition-all">
                 «
               </button>
               <button
                 disabled={safePage === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="px-3 py-1 rounded bg-wuwa-card border border-wuwa-border disabled:opacity-30 hover:border-wuwa-accent transition-all">
+                className="px-3 py-1 rounded bg-black/55 border border-white/10 disabled:opacity-30 hover:border-white/35 transition-all">
                 ←
               </button>
               <span className="px-3 py-1 text-wuwa-muted text-xs">
@@ -303,13 +329,13 @@ export default function HistoryPanel({ pulls }: HistoryPanelProps) {
               <button
                 disabled={safePage === totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="px-3 py-1 rounded bg-wuwa-card border border-wuwa-border disabled:opacity-30 hover:border-wuwa-accent transition-all">
+                className="px-3 py-1 rounded bg-black/55 border border-white/10 disabled:opacity-30 hover:border-white/35 transition-all">
                 →
               </button>
               <button
                 disabled={safePage === totalPages}
                 onClick={() => setPage(totalPages)}
-                className="px-2 py-1 rounded bg-wuwa-card border border-wuwa-border text-xs disabled:opacity-30 hover:border-wuwa-accent transition-all">
+                className="px-2 py-1 rounded bg-black/55 border border-white/10 text-xs disabled:opacity-30 hover:border-white/35 transition-all">
                 »
               </button>
             </div>

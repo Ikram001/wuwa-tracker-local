@@ -55,7 +55,7 @@ export default function PityBar({
         </span>
       </div>
 
-      <div className="h-2 rounded-full bg-wuwa-border overflow-hidden">
+      <div className="h-2 rounded-full bg-white/10 overflow-hidden border border-white/10">
         <div
           className={`h-full rounded-full transition-all duration-500 ${COLOR_CLASS[color]} ${isHard ? "animate-pulse" : ""}`}
           style={{ width: `${pct}%` }}

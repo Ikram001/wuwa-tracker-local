@@ -6,16 +6,16 @@ const config: Config = {
     extend: {
       colors: {
         wuwa: {
-          bg: "#0d0f1a",
-          surface: "#131626",
-          card: "#1a1f35",
-          border: "#252a45",
+          bg: "#000000",
+          surface: "#0a0a0a",
+          card: "#111111",
+          border: "#1e1e1e",
           accent: "#7c6af7",
           gold: "#f5c842",
           silver: "#b06cff",
           bronze: "#5ba4ff",
-          text: "#e2e6ff",
-          muted: "#6b7299",
+          text: "#ffffff",
+          muted: "#888888",
         },
       },
       fontFamily: {
